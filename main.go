@@ -39,7 +39,7 @@ func (refToken *refreshToken) refresh() (*idp.InitiateAuthOutput, error) {
 }
 
 //process the APIGateway proxy request and return either an error or exchanged tokens
-func handleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var myRefreshToken refreshToken
 	err := json.Unmarshal([]byte(event.Body), myRefreshToken)
 	if err != nil {
@@ -63,5 +63,5 @@ func handleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 
 //Entrypoint lambda to run code
 func main() {
-	lambda.Start(handleRequest)
+	lambda.Start(HandleRequest)
 }
