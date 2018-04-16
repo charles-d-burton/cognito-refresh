@@ -34,3 +34,11 @@ zip deployment.zip main
 
 TODO:
  * add more api gateway types
+
+## Deployment
+Upload to Lambda on AWS
+Make the Lambda source an API Gateway resource
+Enable CORS on the API Gateway path for this function
+
+TODO:
+ * Setup the ability for local testing

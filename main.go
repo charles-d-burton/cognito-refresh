@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -50,6 +51,7 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400}, nil
 	}
 	var returnToken authToken
+	//Dereference the token variables
 	idToken := *output.AuthenticationResult.IdToken
 	accessToken := *output.AuthenticationResult.AccessToken
 	returnToken.IDToken = idToken
@@ -63,5 +65,10 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 
 //Entrypoint lambda to run code
 func main() {
-	lambda.Start(HandleRequest)
+	switch os.Getenv("PLATFORM") {
+	case "lambda":
+		lambda.Start(HandleRequest)
+	default:
+		log.Println("no platform defined")
+	}
 }
