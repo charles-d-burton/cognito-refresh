@@ -14,10 +14,12 @@ import (
 	idp "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 )
 
+//Input struct
 type refreshToken struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+//Output struct
 type authToken struct {
 	IDToken     string `json:"idToken"`
 	AccessToken string `json:"accessToken"`
@@ -39,7 +41,7 @@ func (refToken *refreshToken) refresh() (*idp.InitiateAuthOutput, error) {
 	)
 }
 
-//process the APIGateway proxy request and return either an error or exchanged tokens
+//HandleRequest the APIGateway proxy request and return either an error or exchanged tokens
 func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var myRefreshToken refreshToken
 	err := json.Unmarshal([]byte(event.Body), &myRefreshToken)
