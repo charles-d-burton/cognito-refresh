@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -44,13 +45,18 @@ func (refToken *refreshToken) refresh() (*idp.InitiateAuthOutput, error) {
 //HandleRequest the APIGateway proxy request and return either an error or exchanged tokens
 func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var myRefreshToken refreshToken
+	log.Println("BODY: ", event.Body)
 	err := json.Unmarshal([]byte(event.Body), &myRefreshToken)
+	headers := make(map[string]string)
+	headers["Access-Control-Allow-Origin"] = "*"
 	if err != nil {
-		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400}, nil
+		log.Println(err)
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400, Headers: headers}, nil
 	}
 	output, err := myRefreshToken.refresh()
 	if err != nil {
-		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400}, nil
+		log.Println(err)
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400, Headers: headers}, nil
 	}
 	var returnToken authToken
 	//Dereference the token variables
@@ -60,9 +66,16 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 	returnToken.AccessToken = accessToken
 	data, err := json.Marshal(returnToken)
 	if err != nil {
-		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400}, nil
+		log.Println(err)
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 400, Headers: headers}, nil
 	}
-	return events.APIGatewayProxyResponse{Body: string(data), StatusCode: 200}, nil
+	response := events.APIGatewayProxyResponse{
+		Body:       string(data),
+		StatusCode: 200,
+		Headers:    headers,
+	}
+	fmt.Printf("%+v\n", response)
+	return response, nil
 }
 
 //Entrypoint lambda to run code
