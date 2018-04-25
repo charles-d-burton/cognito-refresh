@@ -22,8 +22,9 @@ type refreshToken struct {
 
 //Output struct
 type authToken struct {
-	IDToken     string `json:"idToken"`
-	AccessToken string `json:"accessToken"`
+	IDToken      string `json:"idToken"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 //Contact Cognito and exchange refresh_token for idtoken and accesstoken
@@ -62,8 +63,10 @@ func HandleRequest(ctx context.Context, event events.APIGatewayProxyRequest) (ev
 	//Dereference the token variables
 	idToken := *output.AuthenticationResult.IdToken
 	accessToken := *output.AuthenticationResult.AccessToken
+	refreshToken := *output.AuthenticationResult.RefreshToken
 	returnToken.IDToken = idToken
 	returnToken.AccessToken = accessToken
+	returnToken.RefreshToken = refreshToken
 	data, err := json.Marshal(returnToken)
 	if err != nil {
 		log.Println(err)
